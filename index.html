@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grammatik-Quiz Klasse 6</title>
+<style>
+  :root{
+    --ink:#131a2e;
+    --ink-2:#1c2542;
+    --paper:#f6f2e8;
+    --muted:#9aa4c2;
+    --coral:#e2523f;
+    --amber:#eda21c;
+    --teal:#0f9b8a;
+    --violet:#6f57d8;
+    --good:#2fbf71;
+    --line:rgba(246,242,232,.14);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    -webkit-text-size-adjust:100%;
+    -webkit-tap-highlight-color:transparent;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #222c4e 0%, transparent 60%),
+      var(--ink);
+    color:var(--paper);
+    font-family:"Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    display:flex; align-items:flex-start; justify-content:center;
+    padding:24px;
+    min-height:100%;
+  }
+  .wrap{width:min(1100px,100%)}
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+    border:1px solid var(--line);
+    border-radius:22px;
+    padding:clamp(20px,3vw,38px);
+  }
+  h1{
+    font-size:clamp(28px,5vw,52px);
+    line-height:1.05; margin:0 0 6px;
+    letter-spacing:-.02em;
+  }
+  h1 span{color:var(--amber)}
+  .lead{color:var(--muted); margin:0 0 26px; font-size:clamp(14px,1.6vw,17px)}
+  .label{
+    text-transform:uppercase; letter-spacing:.16em; font-size:12px;
+    color:var(--muted); margin:22px 0 10px; font-weight:700;
+  }
+  .chips{display:flex; flex-wrap:wrap; gap:10px}
+  .chip{
+    border:1px solid var(--line); background:rgba(255,255,255,.04);
+    color:var(--paper); border-radius:999px; padding:11px 18px;
+    font-size:15px; font-weight:600; cursor:pointer; transition:.15s;
+  }
+  .chip:hover{background:rgba(255,255,255,.1)}
+  .chip.on{background:var(--paper); color:var(--ink); border-color:var(--paper)}
+  .chip small{display:block; font-weight:500; opacity:.6; font-size:11px}
+  .row{display:flex; flex-wrap:wrap; gap:26px; align-items:center; margin-top:8px}
+  .switch{display:flex; align-items:center; gap:9px; font-size:15px; cursor:pointer; user-select:none}
+  .switch input{width:18px; height:18px; accent-color:var(--amber); cursor:pointer}
+  .btn{
+    margin-top:28px; border:0; border-radius:14px; cursor:pointer;
+    background:var(--amber); color:#1a1405;
+    font-size:19px; font-weight:800; padding:16px 34px;
+    transition:.15s;
+  }
+  .btn:hover{transform:translateY(-2px)}
+  .btn.ghost{background:transparent; color:var(--paper); border:1px solid var(--line); font-weight:600}
+  .btn:disabled{opacity:.35; cursor:not-allowed; transform:none}
+  .hint{color:var(--muted); font-size:13px; margin-top:16px}
+
+  /* Quiz */
+  .top{display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:14px; font-size:14px; color:var(--muted)}
+  .top b{color:var(--paper)}
+  .bar{height:10px; background:rgba(255,255,255,.08); border-radius:99px; overflow:hidden}
+  .bar>i{display:block; height:100%; width:100%; background:var(--amber); transition:width .1s linear}
+  .bar.warn>i{background:var(--coral)}
+  .question{
+    font-size:clamp(22px,3.6vw,40px); font-weight:800; line-height:1.22;
+    margin:clamp(24px,4vw,44px) 0; text-align:center; letter-spacing:-.01em;
+  }
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+  .tile{
+    display:flex; align-items:center; gap:14px; text-align:left;
+    border:0; border-radius:16px; cursor:pointer; color:#fff;
+    padding:20px 22px; font-size:clamp(16px,2vw,22px); font-weight:700;
+    font-family:inherit; min-height:96px; transition:.15s;
+  }
+  .tile:hover{filter:brightness(1.12)}
+  .tile .k{
+    flex:0 0 34px; height:34px; border-radius:9px;
+    background:rgba(0,0,0,.22); display:grid; place-items:center;
+    font-size:15px; font-weight:800;
+  }
+  .t0{background:var(--coral)} .t1{background:var(--amber); color:#1a1405}
+  .t2{background:var(--teal)} .t3{background:var(--violet)}
+  .tile.dim{opacity:.28}
+  .tile.right{outline:4px solid var(--good); outline-offset:3px; opacity:1}
+  .tile.wrong{outline:4px solid #fff; outline-offset:3px; opacity:1}
+  .verdict{margin-top:22px; text-align:center; font-size:clamp(18px,2.4vw,26px); font-weight:800; min-height:34px}
+  .verdict.ok{color:var(--good)} .verdict.no{color:var(--coral)}
+
+  /* Ende */
+  .score{font-size:clamp(44px,9vw,96px); font-weight:900; letter-spacing:-.03em; line-height:1}
+  table{width:100%; border-collapse:collapse; margin-top:22px; font-size:15px}
+  th,td{text-align:left; padding:11px 8px; border-bottom:1px solid var(--line)}
+  th{color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.1em; font-size:11px}
+  td:last-child, th:last-child{text-align:right}
+  .hidden{display:none}
+  @media (max-width:720px){
+    body{padding:12px}
+    .card{border-radius:16px}
+    .grid{grid-template-columns:1fr}
+    .tile{min-height:64px; padding:16px}
+    .top{font-size:12px; flex-wrap:wrap; gap:8px}
+    .kbd{display:none}
+  }
+  @media (prefers-reduced-motion:reduce){ *{transition:none !important} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <noscript>
+    <div class="card" style="margin-bottom:16px; border-color:#e2523f">
+      <b>Das Quiz läuft hier nicht.</b><br>
+      Diese Datei braucht einen echten Browser. Auf Handy oder Tablet die Datei nicht in der
+      Dateivorschau öffnen, sondern über „Öffnen in“ an Chrome oder Safari weitergeben.
+    </div>
+  </noscript>
+
+  <!-- START -->
+  <section id="start" class="card">
+    <h1>Grammatik-Quiz <span>Klasse 6</span></h1>
+    <p class="lead">Wortarten, Zeitformen, Pronomen, Modalverben und Passiv, die vier Fälle. Auswählen, starten, mitspielen.</p>
+
+    <div class="label">Themenblöcke</div>
+    <div class="chips" id="blocks"></div>
+
+    <div class="label">Einstellungen</div>
+    <div class="row">
+      <label class="switch"><input type="checkbox" id="optTimer" checked> Timer an</label>
+      <label class="switch"><input type="checkbox" id="optShuffleQ" checked> Fragen mischen</label>
+      <label class="switch"><input type="checkbox" id="optShuffleA" checked> Antworten mischen</label>
+      <label class="switch"><input type="checkbox" id="optLimit"> Kurzrunde mit 15 Fragen</label>
+    </div>
+
+    <button class="btn" id="go">Quiz starten</button>
+    <p class="hint kbd">Tastatur: 1 bis 4 zum Antworten, Leertaste für weiter. Vollbild mit F11.</p>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="card hidden">
+    <div class="top">
+      <div id="topic">Wortarten</div>
+      <div>Frage <b id="qnum">1</b> von <b id="qtotal">20</b></div>
+      <div>Punkte <b id="points">0</b></div>
+    </div>
+    <div class="bar" id="bar"><i id="barFill"></i></div>
+    <div class="question" id="qtext"></div>
+    <div class="grid" id="answers"></div>
+    <div class="verdict" id="verdict"></div>
+    <div style="text-align:center">
+      <button class="btn hidden" id="next">Weiter</button>
+    </div>
+  </section>
+
+  <!-- ENDE -->
+  <section id="end" class="card hidden">
+    <div class="label">Ergebnis</div>
+    <div class="score"><span id="finalPct">0</span>%</div>
+    <p class="lead" id="finalLine"></p>
+    <table>
+      <thead><tr><th>Block</th><th>Richtig</th></tr></thead>
+      <tbody id="breakdown"></tbody>
+    </table>
+    <button class="btn" id="again">Noch einmal</button>
+    <button class="btn ghost" id="back">Andere Blöcke wählen</button>
+  </section>
+
+</div>
+
+<script>
+const DATA = [
+ {t:"Wortarten", q:[
+  ["Welche Wortart bezeichnet Menschen, Tiere, Dinge und Gefühle?",["Verb", "Nomen (Substantiv)", "Adjektiv", "Präposition"],1,20],
+  ["Wie schreibt man Nomen im Deutschen immer?",["klein", "kursiv", "groß", "mit Bindestrich"],2,20],
+  ["Welches Wort ist ein Nomen? Der kleine Hund bellt laut.",["kleine", "bellt", "laut", "Hund"],3,20],
+  ["Welche Wortart drückt aus, was jemand tut oder was geschieht?",["Artikel", "Verb", "Adjektiv", "Pronomen"],1,20],
+  ["Welches Wort ist ein Verb? Lena rennt schnell zur Schule.",["rennt", "Lena", "schnell", "Schule"],0,20],
+  ["Welche Wortart beschreibt, wie jemand oder etwas ist?",["Nomen", "Konjunktion", "Adjektiv", "Verb"],2,20],
+  ["Welches Wort ist ein Adjektiv? Das riesige Schiff fährt über das Meer.",["Schiff", "fährt", "Meer", "riesige"],3,20],
+  ["Wie nennt man die Begleiter des Nomens: der, die, das, ein, eine?",["Artikel", "Adverbien", "Pronomen", "Partikeln"],0,20],
+  ["Welche Wortart kann ein Nomen ersetzen?",["Präposition", "Pronomen", "Konjunktion", "Artikel"],1,20],
+  ["Welches Wort ist ein Pronomen? Morgen besuchen wir die Oma.",["Morgen", "besuchen", "wir", "Oma"],2,20],
+  ["Zu welcher Wortart gehören: auf, unter, neben, hinter?",["Konjunktionen", "Adverbien", "Zahlwörter", "Präpositionen"],3,20],
+  ["Welche Wortart verbindet Wörter und Sätze: und, oder, weil?",["Konjunktionen", "Präpositionen", "Artikel", "Adjektive"],0,20],
+  ["Wie nennt man Wörter wie drei, viele, erste?",["Adverbien", "Zahlwörter (Numerale)", "Nomen", "Pronomen"],1,20],
+  ["Welche Wortart kann man steigern? Beispiel: schnell, schneller, am schnellsten",["Adjektiv", "Nomen", "Verb", "Präposition"],0,20],
+  ["Welches Wort ist KEIN Nomen?",["Freiheit", "laufen", "Schule", "Baum"],1,20],
+  ["Welche dieser Wortarten kann man nicht verändern?",["Nomen", "Verb", "Präposition", "Adjektiv"],2,30],
+  ["Wie heißt es, wenn man ein Verb nach Person und Zeit verändert?",["deklinieren", "steigern", "konjugieren", "markieren"],2,30],
+  ["Wie heißt es, wenn man ein Nomen nach den vier Fällen verändert?",["konjugieren", "steigern", "betonen", "deklinieren"],3,30],
+  ["Welcher unbestimmte Artikel passt zu „Buch“?",["ein", "eine", "einen", "einem"],0,20],
+  ["Welche Wortart ist „gestern“ in: Gestern war ich im Kino.",["Nomen", "Adverb", "Verb", "Artikel"],1,30],
+  ["Welches Wort ist ein Artikel? Die Sonne scheint hell.",["Die", "Sonne", "scheint", "hell"],0,20],
+  ["Welches Wort ist eine Präposition? Das Buch liegt auf dem Tisch.",["Buch", "liegt", "auf", "Tisch"],2,20],
+  ["Welches Wort ist eine Konjunktion? Ich bleibe zu Hause, weil es regnet.",["bleibe", "zu", "weil", "regnet"],2,20],
+  ["Wie lautet die Steigerung von „gut“?",["gut, guter, am gutesten", "gut, besser, am besten", "gut, mehr gut, am meisten gut", "gut lässt sich nicht steigern"],1,30],
+  ["Welche Wortart ist „Freundschaft“?",["Adjektiv", "Verb", "Nomen", "Adverb"],2,20],
+  ["Woran erkennt man ein Nomen besonders gut?",["Man kann einen Artikel davorsetzen.", "Man kann es steigern.", "Man kann es konjugieren.", "Es steht immer am Satzende."],0,30],
+  ["Wie nennt man die Grundform eines Verbs?",["Partizip", "Infinitiv", "Imperativ", "Superlativ"],1,20],
+  ["Wie lautet der Infinitiv von „lief“?",["laufen", "gelaufen", "läuft", "liefen"],0,20],
+  ["Welches Wort ist ein bestimmter Artikel?",["ein", "eine", "der", "einem"],2,20],
+  ["Welche Wortart nennt man auch Eigenschaftswort?",["Nomen", "Verb", "Adjektiv", "Pronomen"],2,20],
+  ["Welche Wortart nennt man auch Fürwort?",["Pronomen", "Artikel", "Adverb", "Konjunktion"],0,20],
+  ["Welche Wortart nennt man auch Verhältniswort?",["Konjunktion", "Präposition", "Numerale", "Interjektion"],1,20],
+  ["Welche Wortart nennt man auch Tuwort oder Tätigkeitswort?",["Adjektiv", "Nomen", "Verb", "Artikel"],2,20],
+  ["Wie heißt ein anderes Wort für Nomen?",["Substantiv", "Prädikat", "Partizip", "Adverb"],0,20]
+ ]},
+ {t:"Zeitformen", q:[
+  ["In welcher Zeitform steht: Ich spiele Fußball.",["Präteritum", "Präsens", "Perfekt", "Futur I"],1,20],
+  ["In welcher Zeitform steht: Ich spielte Fußball.",["Präsens", "Perfekt", "Präteritum", "Plusquamperfekt"],2,20],
+  ["In welcher Zeitform steht: Ich habe Fußball gespielt.",["Perfekt", "Präteritum", "Futur I", "Präsens"],0,20],
+  ["In welcher Zeitform steht: Ich hatte Fußball gespielt.",["Perfekt", "Präteritum", "Futur I", "Plusquamperfekt"],3,30],
+  ["In welcher Zeitform steht: Ich werde Fußball spielen.",["Präsens", "Futur I", "Perfekt", "Präteritum"],1,20],
+  ["Welche Zeitform beschreibt, was gerade jetzt passiert?",["Präsens", "Präteritum", "Perfekt", "Plusquamperfekt"],0,20],
+  ["Welche Zeitform benutzt man vor allem, wenn man Geschichten aufschreibt?",["Futur I", "Präsens", "Präteritum", "Perfekt"],2,30],
+  ["Womit bildet man das Perfekt?",["werden + Infinitiv", "haben oder sein + Partizip II", "hatte oder war + Partizip II", "nur mit der Grundform"],1,30],
+  ["Womit bildet man das Plusquamperfekt?",["hatte oder war + Partizip II", "haben oder sein + Partizip II", "werden + Infinitiv", "sein + Adjektiv"],0,30],
+  ["Womit bildet man das Futur I?",["haben + Partizip II", "sein + Partizip II", "werden + Infinitiv", "wollen + Infinitiv"],2,30],
+  ["Wie lautet das Partizip II von „gehen“?",["gehte", "gehen", "geht", "gegangen"],3,20],
+  ["Wie lautet das Präteritum von „sein“ in der 3. Person Singular?",["ist", "war", "gewesen", "wird"],1,20],
+  ["Welche Zeitform zeigt, was noch vor einer anderen Vergangenheit geschehen ist?",["Präteritum", "Perfekt", "Plusquamperfekt", "Präsens"],2,30],
+  ["Ergänze im Perfekt: Ich ___ zur Schule gelaufen.",["habe", "bin", "werde", "hatte"],1,30],
+  ["Wie lautet das Präteritum von „haben“ in der 1. Person Singular?",["hatte", "habe", "gehabt", "hätte"],0,20],
+  ["Welche Zeitform steht in: Wir hatten schon gegessen, als er kam.",["Perfekt", "Präsens", "Futur I", "Plusquamperfekt"],3,30],
+  ["Wie lautet „ich gehe“ im Präteritum?",["ich ging", "ich gegangen", "ich werde gehen", "ich bin gegangen"],0,20],
+  ["Wie lautet „sie kommt“ im Perfekt?",["sie kam", "sie ist gekommen", "sie war gekommen", "sie wird kommen"],1,30],
+  ["Wie lautet „wir lernen“ im Futur I?",["wir lernten", "wir haben gelernt", "wir werden lernen", "wir hatten gelernt"],2,20],
+  ["Welches Hilfsverb braucht „fahren“ im Perfekt?",["haben", "sein", "werden", "mögen"],1,30],
+  ["Welche Verben bilden das Perfekt mit „sein“?",["alle Verben", "Verben der Bewegung und der Zustandsänderung", "nur Verben mit ge-", "nur Modalverben"],1,30],
+  ["Wie lautet das Partizip II von „sehen“?",["gesehen", "gesieht", "sah", "sehte"],0,20],
+  ["Wie lautet das Partizip II von „machen“?",["machte", "gemacht", "gemachen", "machen"],1,20],
+  ["Woran erkennt man das Partizip II oft?",["an der Endung -en am Wortanfang", "an der Vorsilbe ge-", "an der Endung -st", "an der Großschreibung"],1,30],
+  ["In welcher Zeitform steht: Er wird morgen anrufen.",["Präsens", "Perfekt", "Futur I", "Präteritum"],2,20],
+  ["In welcher Zeitform steht: Sie ist nach Hause gegangen.",["Perfekt", "Plusquamperfekt", "Präteritum", "Futur I"],0,20],
+  ["Welche Zeitform ist KEINE Vergangenheitsform?",["Perfekt", "Präteritum", "Plusquamperfekt", "Futur I"],3,30],
+  ["In welcher Zeitform schreibt man normalerweise eine Nacherzählung?",["Präsens", "Präteritum", "Perfekt", "Futur I"],1,30],
+  ["Wie lautet das Präteritum von „werden“ in der 3. Person Singular?",["wird", "wurde", "geworden", "würde"],1,30],
+  ["Wie lautet „ich bin“ im Perfekt?",["ich war", "ich bin gewesen", "ich hatte gewesen", "ich werde sein"],1,30]
+ ]},
+ {t:"Pronomen", q:[
+  ["Was machen Pronomen im Satz?",["Sie beschreiben ein Nomen genauer.", "Sie ersetzen oder begleiten ein Nomen.", "Sie verbinden zwei Sätze.", "Sie zeigen die Zeit an."],1,30],
+  ["Welches Wort ist ein Personalpronomen?",["schnell", "Haus", "ich", "und"],2,20],
+  ["„Das ist mein Buch.“ Welche Art von Pronomen ist „mein“?",["Possessivpronomen", "Personalpronomen", "Relativpronomen", "Demonstrativpronomen"],0,30],
+  ["Welches Pronomen zeigt an, wem etwas gehört?",["Personalpronomen", "Fragepronomen", "Possessivpronomen", "Relativpronomen"],2,30],
+  ["„Dieser Stuhl ist kaputt.“ Welche Art von Pronomen ist „dieser“?",["Personalpronomen", "Demonstrativpronomen", "Possessivpronomen", "Fragepronomen"],1,30],
+  ["Der Junge, DER dort steht, ist mein Bruder. Welche Art von Pronomen ist „der“?",["Artikel", "Personalpronomen", "Possessivpronomen", "Relativpronomen"],3,30],
+  ["Wie heißt das Personalpronomen der 3. Person Plural im Nominativ?",["sie", "ihr", "wir", "es"],0,20],
+  ["Wodurch kann man „Die Kinder spielen“ ersetzen?",["Er spielt.", "Sie spielen.", "Wir spielen.", "Ihr spielt."],1,20],
+  ["„Wer hat das gemacht?“ Welche Art von Pronomen ist „wer“?",["Possessivpronomen", "Demonstrativpronomen", "Fragepronomen (Interrogativpronomen)", "Relativpronomen"],2,30],
+  ["Wie lautet „ich“ im Dativ?",["mich", "meiner", "mein", "mir"],3,20],
+  ["Wie lautet „du“ im Akkusativ?",["dich", "dir", "dein", "du"],0,20],
+  ["Ergänze: Ich helfe ___. (er)",["ihn", "ihm", "er", "sein"],1,30],
+  ["Wie lautet „wir“ im Dativ?",["uns", "unser", "wir", "euch"],0,20],
+  ["Ergänze: Das Buch gehört ___. (ich)",["mich", "mir", "mein", "meiner"],1,30],
+  ["Ergänze: ___ Fahrrad ist neu. (du)",["Dich", "Dir", "Dein", "Du"],2,20],
+  ["Ergänze: Kannst du ___ helfen? (wir)",["uns", "unser", "wir", "euch"],0,30],
+  ["Wie viele Personalpronomen gibt es im Singular?",["zwei", "drei", "vier", "sechs"],1,30],
+  ["Welches Wort ist KEIN Pronomen?",["er", "mein", "dieser", "schnell"],3,20],
+  ["Womit beginnt ein Relativsatz meistens?",["mit einem Verb", "mit einem Relativpronomen wie der, die, das", "mit einem Nomen", "mit einer Präposition"],1,30],
+  ["Warum benutzt man Pronomen beim Schreiben?",["Um Wortwiederholungen zu vermeiden.", "Um den Text länger zu machen.", "Um die Zeitform zu zeigen.", "Um Nomen groß zu schreiben."],0,30],
+  ["Wie lautet „er“ im Akkusativ?",["ihm", "ihn", "sein", "er"],1,20],
+  ["Welches Possessivpronomen passt: Das ist ___ Tasche. (sie)",["ihre", "seine", "eure", "deine"],0,30]
+ ]},
+ {t:"Modalverben und Passiv", q:[
+  ["Welches dieser Verben ist ein Modalverb?",["laufen", "sehen", "können", "gehen"],2,20],
+  ["Wie viele Modalverben gibt es im Deutschen?",["vier", "sechs", "acht", "zehn"],1,20],
+  ["Welches Wort gehört NICHT zu den Modalverben?",["dürfen", "müssen", "wollen", "werden"],3,30],
+  ["Was drücken Modalverben aus?",["die Zeit einer Handlung", "den Fall eines Nomens", "Möglichkeit, Erlaubnis oder Notwendigkeit", "den Besitz"],2,30],
+  ["„Ich muss heute lernen.“ Welches Wort ist das Modalverb?",["muss", "Ich", "heute", "lernen"],0,20],
+  ["In welcher Form steht das zweite Verb bei einem Modalverb?",["im Partizip II", "im Infinitiv am Satzende", "im Präteritum", "als Nomen"],1,30],
+  ["In welcher Form steht: Der Kuchen wird gebacken.",["Aktiv", "Futur I", "Passiv", "Perfekt"],2,30],
+  ["Womit bildet man das Passiv?",["haben + Partizip II", "sein + Infinitiv", "werden + Infinitiv", "werden + Partizip II"],3,30],
+  ["Was ist im Aktiv wichtig?",["Wer etwas tut, steht im Mittelpunkt.", "Die Handlung steht im Mittelpunkt.", "Die Zeit steht im Mittelpunkt.", "Der Ort steht im Mittelpunkt."],0,30],
+  ["Wie lautet der Passivsatz zu: Der Lehrer erklärt die Aufgabe.",["Die Aufgabe wird vom Lehrer erklärt.", "Der Lehrer wird die Aufgabe erklären.", "Die Aufgabe hat der Lehrer erklärt.", "Der Lehrer kann die Aufgabe erklären."],0,30],
+  ["Welche Reihe enthält nur Modalverben?",["dürfen, können, mögen", "haben, sein, werden", "gehen, stehen, sehen", "lesen, schreiben, rechnen"],0,30],
+  ["Welches Modalverb drückt eine Erlaubnis aus?",["müssen", "dürfen", "sollen", "mögen"],1,20],
+  ["Welches Modalverb drückt eine Notwendigkeit aus?",["mögen", "dürfen", "müssen", "wollen"],2,20],
+  ["Welches Modalverb drückt einen starken Wunsch aus?",["wollen", "sollen", "dürfen", "können"],0,20],
+  ["Wie lautet „ich kann“ im Präteritum?",["ich könnte", "ich konnte", "ich gekonnt", "ich werde können"],1,30],
+  ["Aktiv oder Passiv: Die Kinder singen ein Lied.",["Aktiv", "Passiv", "Futur I", "Perfekt"],0,20],
+  ["Wie lautet der Passivsatz zu: Die Klasse schreibt einen Test.",["Ein Test wird von der Klasse geschrieben.", "Die Klasse wird einen Test schreiben.", "Die Klasse hat einen Test geschrieben.", "Ein Test schreibt die Klasse."],0,30],
+  ["Wann benutzt man das Passiv?",["Wenn die Handlung wichtiger ist als die handelnde Person.", "Wenn etwas in der Zukunft passiert.", "Wenn man eine Frage stellt.", "Wenn ein Nomen fehlt."],0,30]
+ ]},
+ {t:"Die vier Fälle", q:[
+  ["Wie heißen die vier Fälle in der richtigen Reihenfolge?",["Nominativ, Dativ, Genitiv, Akkusativ", "Nominativ, Genitiv, Dativ, Akkusativ", "Genitiv, Nominativ, Akkusativ, Dativ", "Nominativ, Akkusativ, Dativ, Genitiv"],1,30],
+  ["Mit welcher Frage bestimmt man den Nominativ?",["Wessen?", "Wem?", "Wer oder was?", "Wen oder was?"],2,20],
+  ["Mit welcher Frage bestimmt man den Genitiv?",["Wessen?", "Wem?", "Wer oder was?", "Wen oder was?"],0,20],
+  ["Mit welcher Frage bestimmt man den Dativ?",["Wen oder was?", "Wem?", "Wessen?", "Wer oder was?"],1,20],
+  ["Mit welcher Frage bestimmt man den Akkusativ?",["Wer oder was?", "Wessen?", "Wem?", "Wen oder was?"],3,20],
+  ["In welchem Fall steht „des Hundes“?",["Nominativ", "Genitiv", "Dativ", "Akkusativ"],1,20],
+  ["In welchem Fall steht „dem Hund“? Ich gebe dem Hund einen Knochen.",["Nominativ", "Genitiv", "Akkusativ", "Dativ"],3,30],
+  ["In welchem Fall steht „den Mann“? Ich sehe den Mann.",["Akkusativ", "Dativ", "Nominativ", "Genitiv"],0,20],
+  ["In welchem Fall steht das Subjekt eines Satzes?",["Genitiv", "Dativ", "Nominativ", "Akkusativ"],2,30],
+  ["Welcher Fall folgt auf die Präpositionen mit, bei, von, zu?",["Nominativ", "Akkusativ", "Genitiv", "Dativ"],3,30],
+  ["Wie lautet „der Baum“ im Dativ?",["des Baumes", "dem Baum", "den Baum", "der Baum"],1,30],
+  ["Wie lautet „die Blume“ im Genitiv?",["der Blume", "die Blume", "den Blumen", "dem Blume"],0,30],
+  ["Wie lautet „das Kind“ im Akkusativ?",["dem Kind", "des Kindes", "das Kind", "der Kinder"],2,30],
+  ["In welchem Fall steht „meiner Schwester“? Ich schenke meiner Schwester ein Buch.",["Nominativ", "Dativ", "Akkusativ", "Genitiv"],1,30],
+  ["Welcher Fall folgt auf die Präpositionen für, ohne, gegen, um?",["Dativ", "Genitiv", "Akkusativ", "Nominativ"],2,30],
+  ["Wie nennt man den Nominativ auch?",["Werfall (1. Fall)", "Wesfall (2. Fall)", "Wemfall (3. Fall)", "Wenfall (4. Fall)"],0,20],
+  ["Wie nennt man den Genitiv auch?",["Werfall (1. Fall)", "Wesfall (2. Fall)", "Wemfall (3. Fall)", "Wenfall (4. Fall)"],1,20],
+  ["Wie nennt man den Dativ auch?",["Werfall (1. Fall)", "Wesfall (2. Fall)", "Wemfall (3. Fall)", "Wenfall (4. Fall)"],2,20],
+  ["Wie nennt man den Akkusativ auch?",["Werfall (1. Fall)", "Wesfall (2. Fall)", "Wemfall (3. Fall)", "Wenfall (4. Fall)"],3,20]
+ ]},
+ {t:"Satzglieder", q:[
+  ["Wie nennt man die Bausteine, aus denen ein Satz besteht?",["Wortarten", "Satzglieder", "Silben", "Satzzeichen"],1,20],
+  ["Wie findet man heraus, was ein Satzglied ist?",["mit der Umstellprobe", "mit der Klangprobe", "mit der Verlängerungsprobe", "mit dem Wörterbuch"],0,30],
+  ["Welches Satzglied besteht immer aus einem Verb?",["Subjekt", "Objekt", "Prädikat", "Adverbiale Bestimmung"],2,20],
+  ["Mit welcher Frage findet man das Subjekt?",["Wen oder was?", "Wer oder was?", "Wem?", "Wessen?"],1,20],
+  ["In welchem Fall steht das Akkusativobjekt?",["Nominativ", "Genitiv", "Dativ", "Akkusativ"],3,20],
+  ["Mit welcher Frage findet man das Dativobjekt?",["Wem?", "Wen oder was?", "Wessen?", "Wo?"],0,20],
+  ["Was ist „Der Hund“ in: Der Hund bellt laut.",["Prädikat", "Subjekt", "Objekt", "Adverbiale Bestimmung"],1,20],
+  ["Was ist „einen Brief“ in: Ich schreibe einen Brief.",["Subjekt", "Dativobjekt", "Akkusativobjekt", "Prädikat"],2,30],
+  ["Was ist „meinem Freund“ in: Ich helfe meinem Freund.",["Akkusativobjekt", "Dativobjekt", "Subjekt", "Prädikat"],1,30],
+  ["Welches Satzglied antwortet auf die Frage Wo?",["adverbiale Bestimmung des Ortes", "adverbiale Bestimmung der Zeit", "Subjekt", "Akkusativobjekt"],0,30],
+  ["Mit welcher Frage findet man die adverbiale Bestimmung der Zeit?",["Wo?", "Wann?", "Wie?", "Warum?"],1,20],
+  ["Aus wie vielen Satzgliedern besteht: Ich lese ein Buch.",["zwei", "drei", "vier", "fünf"],1,30],
+  ["An welcher Stelle steht das Prädikat im Aussagesatz?",["immer am Anfang", "immer an zweiter Stelle", "immer am Ende", "an einer beliebigen Stelle"],1,30],
+  ["Was ist „nach Berlin“ in: Wir fahren nach Berlin.",["Subjekt", "Akkusativobjekt", "adverbiale Bestimmung des Ortes", "Prädikat"],2,30]
+ ]}
+];
+
+const $ = s => document.querySelector(s);
+const shuffle = a => { for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];} return a; };
+
+let picked = new Set(DATA.map((_,i)=>i));
+let queue = [], idx = 0, points = 0, correct = 0, stats = {};
+let timerId = null, left = 0, span = 0, locked = false;
+
+// Startbildschirm
+const blocksEl = $("#blocks");
+DATA.forEach((b,i)=>{
+  const c = document.createElement("button");
+  c.className = "chip on";
+  c.innerHTML = b.t + "<small>" + b.q.length + " Fragen</small>";
+  c.onclick = ()=>{
+    if(picked.has(i)) picked.delete(i); else picked.add(i);
+    c.classList.toggle("on", picked.has(i));
+    $("#go").disabled = picked.size === 0;
+  };
+  blocksEl.appendChild(c);
+});
+
+$("#go").onclick = start;
+$("#again").onclick = start;
+$("#back").onclick = ()=>{ $("#end").classList.add("hidden"); $("#start").classList.remove("hidden"); };
+$("#next").onclick = nextQuestion;
+
+function start(){
+  queue = [];
+  stats = {};
+  [...picked].sort().forEach(i=>{
+    stats[DATA[i].t] = {ok:0, n:0};
+    DATA[i].q.forEach(q=> queue.push({topic:DATA[i].t, text:q[0], answers:q[1], right:q[2], time:q[3]}));
+  });
+  if($("#optShuffleQ").checked) shuffle(queue);
+  if($("#optLimit").checked) queue = queue.slice(0,15);
+  queue.forEach(q=> stats[q.topic].n++);
+  idx = 0; points = 0; correct = 0;
+  $("#qtotal").textContent = queue.length;
+  $("#start").classList.add("hidden");
+  $("#end").classList.add("hidden");
+  $("#quiz").classList.remove("hidden");
+  render();
+}
+
+function render(){
+  const q = queue[idx];
+  locked = false;
+  $("#topic").textContent = q.topic;
+  $("#qnum").textContent = idx+1;
+  $("#points").textContent = points;
+  $("#qtext").textContent = q.text;
+  $("#verdict").textContent = "";
+  $("#verdict").className = "verdict";
+  $("#next").classList.add("hidden");
+
+  let order = q.answers.map((a,i)=>({a, i}));
+  if($("#optShuffleA").checked) shuffle(order);
+  const box = $("#answers");
+  box.innerHTML = "";
+  order.forEach((o, pos)=>{
+    const b = document.createElement("button");
+    b.className = "tile t"+pos;
+    b.innerHTML = '<span class="k">'+(pos+1)+'</span><span>'+o.a+'</span>';
+    b.onclick = ()=> answer(o.i === q.right, b);
+    box.appendChild(b);
+  });
+
+  const bar = $("#bar");
+  if($("#optTimer").checked){
+    bar.style.visibility = "visible";
+    span = q.time; left = q.time;
+    bar.classList.remove("warn");
+    $("#barFill").style.width = "100%";
+    clearInterval(timerId);
+    timerId = setInterval(tick, 100);
+  } else {
+    bar.style.visibility = "hidden";
+    clearInterval(timerId);
+  }
+}
+
+function tick(){
+  left -= 0.1;
+  $("#barFill").style.width = Math.max(0, left/span*100) + "%";
+  if(left <= span*0.25) $("#bar").classList.add("warn");
+  if(left <= 0){ clearInterval(timerId); answer(false, null, true); }
+}
+
+function answer(isRight, btn, timeout){
+  if(locked) return;
+  locked = true;
+  clearInterval(timerId);
+  const q = queue[idx];
+  const tiles = [...document.querySelectorAll(".tile")];
+  tiles.forEach(t=> t.classList.add("dim"));
+  const rightText = q.answers[q.right];
+  tiles.forEach(t=>{ if(t.textContent.slice(1) === rightText) t.classList.replace("dim","right"); });
+  if(btn && !isRight) btn.classList.replace("dim","wrong");
+
+  const v = $("#verdict");
+  if(isRight){
+    const gained = $("#optTimer").checked ? Math.round(500 + 500*(left/span)) : 700;
+    points += gained; correct++; stats[q.topic].ok++;
+    v.textContent = "Richtig, plus " + gained + " Punkte";
+    v.className = "verdict ok";
+  } else {
+    v.textContent = timeout ? "Zeit abgelaufen. Richtig ist: " + rightText
+                            : "Nicht ganz. Richtig ist: " + rightText;
+    v.className = "verdict no";
+  }
+  $("#points").textContent = points;
+  $("#next").textContent = idx+1 < queue.length ? "Weiter" : "Ergebnis anzeigen";
+  $("#next").classList.remove("hidden");
+}
+
+function nextQuestion(){
+  idx++;
+  if(idx < queue.length) render(); else finish();
+}
+
+function finish(){
+  clearInterval(timerId);
+  $("#quiz").classList.add("hidden");
+  $("#end").classList.remove("hidden");
+  const pct = Math.round(correct/queue.length*100);
+  $("#finalPct").textContent = pct;
+  $("#finalLine").textContent = correct + " von " + queue.length + " Fragen richtig, " + points + " Punkte.";
+  const tb = $("#breakdown");
+  tb.innerHTML = "";
+  Object.entries(stats).forEach(([name, s])=>{
+    if(!s.n) return;
+    const tr = document.createElement("tr");
+    tr.innerHTML = "<td>"+name+"</td><td>"+s.ok+" von "+s.n+"</td>";
+    tb.appendChild(tr);
+  });
+}
+
+document.addEventListener("keydown", e=>{
+  if($("#quiz").classList.contains("hidden")) return;
+  if(["1","2","3","4"].includes(e.key)){
+    const t = document.querySelectorAll(".tile")[+e.key-1];
+    if(t) t.click();
+  }
+  if(e.key === " " || e.key === "Enter"){
+    e.preventDefault();
+    if(!$("#next").classList.contains("hidden")) nextQuestion();
+  }
+});
+</script>
+</body>
+</html>
